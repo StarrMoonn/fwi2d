@@ -21,7 +21,7 @@ Key features include:
 
 Start by cloning the current repository
 ```
-git clone https://github.com/nmbader/fwi2d.git
+git clone https://github.com/StarrMoonn/fwi2d.git
 cd fwi2d
 ```
 
