@@ -1514,15 +1514,14 @@ void nl_we_op_vti::compute_gradients(const data_t * model, const data_t * u_full
         #pragma omp parallel for private(val1,val2,val3,val4,del)
         for (int i=0; i<nxz; i++) 
         {
-            del = ((pm[3][i]+pm[1][i])*(pm[3][i]+pm[1][i]) - (pm[0][i]+pm[1][i])*(pm[0][i]+pm[1][i])) / (2*(pm[0][i]+pm[1][i])*(pm[0][i]+2*pm[1][i]));((pm[3][i]+pm[1][i])*(pm[3][i]+pm[1][i]) - (pm[0][i]+pm[1][i])*(pm[0][i]+pm[1][i])) / (2*(pm[0][i]+pm[1][i])*(pm[0][i]+2*pm[1][i]));
-            val1 = sqrt(2*(pm[0][i]+2*pm[1][i])*(pm[0][i]+pm[1][i])*del + (pm[0][i]+pm[1][i])*(pm[0][i]+pm[1][i]));
+            del = ((pm[3][i]+pm[1][i])*(pm[3][i]+pm[1][i]) - (pm[0][i]+pm[1][i])*(pm[0][i]+pm[1][i])) / (2*(pm[0][i]+pm[1][i])*(pm[0][i]+2*pm[1][i]));
             val2 = ((1+2*del)*pm[0][i] + (1+3*del)*pm[1][i])/val1; // d(C13)/d(lambda)
             val3 = ((1+3*del)*pm[0][i] + (1+4*del)*pm[1][i])/val1 - 1; // d(C13)/d(mu)
             val4 = (pm[0][i]+2*pm[1][i])*(pm[0][i]+pm[1][i])/val1; // d(C13)/d(delta)
             g[0][i] += w*dt*((1+2*pm[4][i])*padj_x[0][i]*temp[0][i] + padj_z[1][i]*temp[1][i] + val2*(padj_x[0][i]*temp[1][i] + padj_z[1][i]*temp[0][i])); // lambda gradient
             g[1][i] += w*dt*((padj_z[0][i] + padj_x[1][i])*(temp[2][i] + temp[3][i]) + 2*(1+2*pm[4][i])*padj_x[0][i]*temp[0][i] + 2*padj_z[1][i]*temp[1][i] + val3*(padj_x[0][i]*temp[1][i] + padj_z[1][i]*temp[0][i])); // mu gradient
             g[2][i] += w*1.0/dt*(padj[0][i]*(pfor[it+1][0][i]-2*pfor[it][0][i]+pfor[it-1][0][i]) + padj[1][i]*(pfor[it+1][1][i]-2*pfor[it][1][i]+pfor[it-1][1][i])); // rho gradient
-            g[3][i] += w*dt*val4*2*(padj_x[0][i]*temp[1][i] + padj_z[1][i]*temp[0][i]); // delta gradient
+            g[3][i] += w*dt*val4*(padj_x[0][i]*temp[1][i] + padj_z[1][i]*temp[0][i]); // delta gradient
             g[4][i] += w*dt*2*(pm[0][i]+2*pm[1][i])*padj_x[0][i]*temp[0][i]; // epsilon gradient
         }
     }
@@ -1531,7 +1530,7 @@ void nl_we_op_vti::compute_gradients(const data_t * model, const data_t * u_full
         #pragma omp parallel for private(val1,val2,val3,val4,del)
         for (int i=0; i<nxz; i++) 
         {
-            del = ((pm[3][i]+pm[1][i])*(pm[3][i]+pm[1][i]) - (pm[0][i]+pm[1][i])*(pm[0][i]+pm[1][i])) / (2*(pm[0][i]+pm[1][i])*(pm[0][i]+2*pm[1][i]));((pm[3][i]+pm[1][i])*(pm[3][i]+pm[1][i]) - (pm[0][i]+pm[1][i])*(pm[0][i]+pm[1][i])) / (2*(pm[0][i]+pm[1][i])*(pm[0][i]+2*pm[1][i]));
+            del = ((pm[3][i]+pm[1][i])*(pm[3][i]+pm[1][i]) - (pm[0][i]+pm[1][i])*(pm[0][i]+pm[1][i])) / (2*(pm[0][i]+pm[1][i])*(pm[0][i]+2*pm[1][i]));
             val1 = sqrt(2*(pm[0][i]+2*pm[1][i])*(pm[0][i]+pm[1][i])*del + (pm[0][i]+pm[1][i])*(pm[0][i]+pm[1][i]));
             val2 = ((1+2*del)*pm[0][i] + (1+3*del)*pm[1][i])/val1; // d(C13)/d(lambda)
             val3 = ((1+3*del)*pm[0][i] + (1+4*del)*pm[1][i])/val1 - 1; // d(C13)/d(mu)
@@ -1539,7 +1538,7 @@ void nl_we_op_vti::compute_gradients(const data_t * model, const data_t * u_full
             g[0][i] += w*0.5*dt*((1+2*pm[4][i])*padj_x[0][i]*temp[0][i] + padj_z[1][i]*temp[1][i] + val2*(padj_x[0][i]*temp[1][i] + padj_z[1][i]*temp[0][i])); // lambda gradient
             g[1][i] += w*0.5*dt*((padj_z[0][i] + padj_x[1][i])*(temp[2][i] + temp[3][i]) + 2*(1+2*pm[4][i])*padj_x[0][i]*temp[0][i] + 2*padj_z[1][i]*temp[1][i] + val3*(padj_x[0][i]*temp[1][i] + padj_z[1][i]*temp[0][i])); // mu gradient
             g[2][i] += w*1.0/dt*(padj[0][i]*(pfor[it+1][0][i]-pfor[it][0][i]) + padj[1][i]*(pfor[it+1][1][i]-pfor[it][1][i])); // rho gradient
-            g[3][i] += w*0.5*dt*val4*2*(padj_x[0][i]*temp[1][i] + padj_z[1][i]*temp[0][i]); // delta gradient
+            g[3][i] += w*0.5*dt*val4*(padj_x[0][i]*temp[1][i] + padj_z[1][i]*temp[0][i]); // delta gradient
             g[4][i] += w*0.5*dt*2*(pm[0][i]+2*pm[1][i])*padj_x[0][i]*temp[0][i]; // epsilon gradient
         }
     }
@@ -1548,7 +1547,7 @@ void nl_we_op_vti::compute_gradients(const data_t * model, const data_t * u_full
         #pragma omp parallel for private(val1,val2,val3,val4,del)
         for (int i=0; i<nxz; i++) 
         {
-            del = ((pm[3][i]+pm[1][i])*(pm[3][i]+pm[1][i]) - (pm[0][i]+pm[1][i])*(pm[0][i]+pm[1][i])) / (2*(pm[0][i]+pm[1][i])*(pm[0][i]+2*pm[1][i]));((pm[3][i]+pm[1][i])*(pm[3][i]+pm[1][i]) - (pm[0][i]+pm[1][i])*(pm[0][i]+pm[1][i])) / (2*(pm[0][i]+pm[1][i])*(pm[0][i]+2*pm[1][i]));
+            del = ((pm[3][i]+pm[1][i])*(pm[3][i]+pm[1][i]) - (pm[0][i]+pm[1][i])*(pm[0][i]+pm[1][i])) / (2*(pm[0][i]+pm[1][i])*(pm[0][i]+2*pm[1][i]));
             val1 = sqrt(2*(pm[0][i]+2*pm[1][i])*(pm[0][i]+pm[1][i])*del + (pm[0][i]+pm[1][i])*(pm[0][i]+pm[1][i]));
             val2 = ((1+2*del)*pm[0][i] + (1+3*del)*pm[1][i])/val1; // d(C13)/d(lambda)
             val3 = ((1+3*del)*pm[0][i] + (1+4*del)*pm[1][i])/val1 - 1; // d(C13)/d(mu)
@@ -1556,7 +1555,7 @@ void nl_we_op_vti::compute_gradients(const data_t * model, const data_t * u_full
             g[0][i] += w*dt*((1+2*pm[4][i])*padj_x[0][i]*temp[0][i] + padj_z[1][i]*temp[1][i] + val2*(padj_x[0][i]*temp[1][i] + padj_z[1][i]*temp[0][i])); // lambda gradient
             g[1][i] += w*dt*((padj_z[0][i] + padj_x[1][i])*(temp[2][i] + temp[3][i]) + 2*(1+2*pm[4][i])*padj_x[0][i]*temp[0][i] + 2*padj_z[1][i]*temp[1][i] + val3*(padj_x[0][i]*temp[1][i] + padj_z[1][i]*temp[0][i])); // mu gradient
             g[2][i] += w*1.0/dt*(padj[0][i]*(-pfor[it][0][i]+pfor[it-1][0][i]) + padj[1][i]*(-pfor[it][1][i]+pfor[it-1][1][i])); // rho gradient
-            g[3][i] += w*dt*val4*2*(padj_x[0][i]*temp[1][i] + padj_z[1][i]*temp[0][i]); // delta gradient
+            g[3][i] += w*dt*val4*(padj_x[0][i]*temp[1][i] + padj_z[1][i]*temp[0][i]); // delta gradient
             g[4][i] += w*dt*2*(pm[0][i]+2*pm[1][i])*padj_x[0][i]*temp[0][i]; // epsilon gradient
         }
     }
